@@ -51,5 +51,16 @@ export default StyleSheet.create({
     fontSize: 18,
     paddingLeft: 10,
     color: 'black'
-  }
+  },
+  logoutIcon: {
+    position: 'absolute',
+    right: 10,
+    top: 10
+  },
+  headerItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  
 });

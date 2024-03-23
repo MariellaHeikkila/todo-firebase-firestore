@@ -1,10 +1,11 @@
 import { Pressable, Text, View } from "react-native"
 import style from '../styles/style'
-import { useState } from 'react'
-import { updateDoc, doc, deleteDoc } from 'firebase/firestore'
-import { db, TODOS_REF } from '../firebase/Config'
+import React, { useState } from 'react'
+import { collection, updateDoc, doc, deleteDoc } from 'firebase/firestore'
+import { db, TODOS_REF, USERS_REF } from '../firebase/Config'
 import { MaterialIcons } from '@expo/vector-icons'
 import EnTypo from '@expo/vector-icons/Entypo'
+import { auth } from '../firebase/Config'
 
 const unchecked_background = '#c8e6f1'
 const checked_background = '#e1f1c3'
@@ -16,7 +17,10 @@ export const TodoItem = ({todoItem: todoItem, done: done, todoId: todoId}) => {
     const onCheck = async() => {
         try {
             setDone(!doneState)
-            await updateDoc(doc(db, TODOS_REF, todoId), {
+            const subColRef = collection(
+                db, USERS_REF, auth.currentUser.uid, TODOS_REF
+            )
+            await updateDoc(doc(subColRef, todoId), {
                 done: !doneState
             })
         }
@@ -26,7 +30,10 @@ export const TodoItem = ({todoItem: todoItem, done: done, todoId: todoId}) => {
 
         const onRemove = async() => {
             try {
-                await deleteDoc(doc(db, TODOS_REF, todoId))
+                const subColRef = collection(
+                    db, USERS_REF, auth.currentUser.uid, TODOS_REF
+                )
+                await deleteDoc(doc(subColRef, todoId))
             }
             catch (error) {
                 console.log(error.message);
