@@ -62,5 +62,9 @@ export default StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center'
   },
+  myAccountSubheader: {
+    marginTop: 20,
+    fontSize: 20
+  },
   
 });

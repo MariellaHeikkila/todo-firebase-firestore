@@ -1,10 +1,14 @@
 import {
     signOut,
     signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    updateEmail,
+    updatePassword,
+    deleteUser,
+    sendPasswordResetEmail
 } from 'firebase/auth';
-import { auth, db, USERS_REF } from '../firebase/Config';
-import {  doc, setDoc } from 'firebase/firestore';
+import { auth, db, USERS_REF, TODOS_REF } from '../firebase/Config';
+import {  doc, setDoc, collection, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { Alert } from 'react-native';
 
 
@@ -45,4 +49,82 @@ export const login = async (email, password) => {
         console.log("Login failed.", error.message);
         Alert.alert("Login failed.", error.message);
     });
+}
+
+export const updateEmailAddress = async (email) => {
+        await updateEmail(auth.currentUser, email)
+        .then(() => {
+            console.log("Email address was updated.");
+        })
+        .catch((error) => {
+            console.log("Email address update failed.", error.message);
+            Alert.alert("Email address update failed.", error.message);
+        });
+    }
+
+export const changePassword = async (password) => {
+    await updatePassword(auth.currentUser, password)
+    .then(() => {
+        console.log("Password was updated.");
+        Alert.alert("Password was updated.");
+    })
+    .catch((error) => {
+        console.log("Password update failed.", error.message);
+        Alert.alert("Password update failed.", error.message);
+    });
+}
+
+export const resetPassword = async (email) => {
+    auth.languageCode = 'fi';
+    await sendPasswordResetEmail(auth, email)
+    .then(() => {
+        console.log("Password reset email sent.");
+        Alert.alert("Password reset email sent.");
+    }).catch((error) => {
+        console.log("Error sending password reset email:", error.message);
+        Alert.alert("Error sending password reset email:", error.message);
+    });
+}
+
+const removeTodo = async (id) => {
+    try {
+        const subColRef = collection(db, USERS_REF, auth.currentUser.uid, TODOS_REF)
+        await deleteDoc(doc(subColRef, id))
+        console.log("Todo deleted.");
+    }
+    catch (error) {
+        console.log("Error deleting todos:", error)
+        Alert.alert("Error deleting todos:", error)
+    }
+}
+
+const deleteTodoDocuments = async () => {
+    const subColRef = collection(db, USERS_REF, auth.currentUser.uid, TODOS_REF)
+    onSnapshot(subColRef, (querySnapshot) => {
+        querySnapshot.docs.map(doc => {
+            removeTodo(doc.id)
+        })
+    })
+}
+
+const deleteUserDocument = async () => {
+    await deleteDoc(doc(db, USERS_REF, auth.currentUser.uid))
+    .then(() => {
+        console.log("User document deleted.");
+    }).catch((error) => {
+        console.log("Error deleting user document:", error)
+        Alert.alert("Error deleting user document:", error)
+    })
+}
+
+export const removeUser = async () => {
+    deleteTodoDocuments();
+    deleteUserDocument();
+    deleteUser(auth.currentUser)
+    .then(() => {
+        console.log("User deleted.");
+    }).catch((error) => {
+        console.log("Error deleting user:", error)
+        Alert.alert("Error deleting user:", error)
+    })
 }

@@ -71,6 +71,10 @@ export default function Register({ navigation }) {
                     title='Go to todos'
                     onPress={() => navigation.navigate('Todos')}
                 />
+                <Button
+                    title='Go to my account'
+                    onPress={() => navigation.navigate('MyAccount')}
+                />
             </View>                
             )
         } else {

@@ -1,7 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "../firebase/Config"
 import { useEffect, useState } from "react"
-import { logout, login } from "../components/Auth"
+import { logout, login, resetPassword } from "../components/Auth"
 import { Alert, Pressable } from "react-native"
 import { Button, Text, View, TextInput } from "react-native"
 import styles from "../styles/style"
@@ -12,7 +12,9 @@ export default function Register({ navigation }) {
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
-    const [isLoggedIn, setIsLoggedIn] = useState(false)    
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [showForgotPw, setShowForgotPw] = useState(false)
+    const [emailForgotPw, setEmailForgotPw] = useState('')
 
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
@@ -42,6 +44,19 @@ export default function Register({ navigation }) {
         }
     }
 
+    const handlePressResetPw = () => {
+        if (!emailForgotPw) {
+            Alert.alert('Please enter an email')
+        } else {
+            resetPassword(emailForgotPw)            
+            setShowForgotPw(false)
+        }
+    }
+
+    const handlePressForgotPw = () => {
+        setShowForgotPw(!showForgotPw)
+    }
+
     const handlePressLogout = async () => {
         logout()
     }
@@ -59,6 +74,10 @@ export default function Register({ navigation }) {
                 <Button
                     title='Go to todos'
                     onPress={() => navigation.navigate('Todos')}
+                />
+                <Button
+                    title='Go to my account'
+                    onPress={() => navigation.navigate('MyAccount')}
                 />
             </View>                
             )
@@ -97,6 +116,24 @@ export default function Register({ navigation }) {
                         title="Register"
                         onPress={() => navigation.navigate('Register')}
                     />
+                    <Pressable style={styles.buttonStyle} onPress={handlePressForgotPw}>
+                        <Text style={styles.infoText}>Forgot password?</Text>
+                    </Pressable>
+                    {showForgotPw && 
+                    <>
+                    <TextInput
+                        style={styles.textInput}
+                        placeholder="Enter your email"
+                        value={emailForgotPw}
+                        onChangeText={(emailForgotPw) => setEmailForgotPw(emailForgotPw)}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    <Pressable style={styles.buttonStyle} onPress={()=>handlePressResetPw()}>
+                        <Text style={styles.infoText}>Reset password. Check you spam folder too after resetting.</Text>
+                    </Pressable>
+                    </>
+                    }
                 </View>
             )
         }

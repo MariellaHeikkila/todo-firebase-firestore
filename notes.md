@@ -6,6 +6,14 @@ unchecked ja checked list
 checked list remove item tai uncheck
 poista kaikki
 
+update account
+    For this practice, firestore/auth/settings/actions/disable email enumeration protection
+    (so there is no need to use verification email)
+OR
+    remove the possibility for email address update
+    (check MyAccount/updateUserData() )
+
+
 npx expo install firebase
 
 Navigointi:
